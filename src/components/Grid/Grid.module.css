@@ -1,0 +1,17 @@
+.grid {
+  --columns: 12;
+  --gap: clamp(0.75rem, 1.5vw, 1.25rem);
+
+  display: grid;
+  /* minmax(0, 1fr) rather than a bare 1fr: a 1fr track has an auto minimum, so
+     one long unbreakable string or a wide <pre> pushes its column past its
+     share and skews the whole row. */
+  grid-template-columns: repeat(var(--columns), minmax(0, 1fr));
+  gap: var(--gap);
+}
+
+/* Same guard, one level down — a child spanning several tracks still needs its
+   own floor. Doesn't touch placement, so grid-area on children is unaffected. */
+.grid > * {
+  min-width: 0;
+}

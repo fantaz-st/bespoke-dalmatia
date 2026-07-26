@@ -3,6 +3,7 @@
   min-height: 100vh;
   min-height: 100dvh; /* accounts for mobile browser chrome */
   flex-direction: column;
+  position: relative;
 }
 
 /* --- Vertical column guides ---------------------------------------------- */

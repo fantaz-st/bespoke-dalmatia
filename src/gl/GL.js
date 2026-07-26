@@ -159,6 +159,11 @@ class GL {
   render() {
     this.raf = requestAnimationFrame(this.render);
 
+    // A context can die under us — GPU process crash, driver reset, a tab
+    // backgrounded for too long on mobile. Bail rather than throw on every
+    // frame for the rest of the session.
+    if (this.gl.isContextLost()) return;
+
     // Pushing a new frame of the <video> into the texture every tick is what
     // makes the slide "play" — a texture is a static upload otherwise.
     if (this.textures?.[this.currentSlideIndex]?.image) {
@@ -188,7 +193,25 @@ class GL {
 
     this.program.remove();
     this.geometry.remove();
-    this.gl.getExtension("WEBGL_lose_context")?.loseContext();
+
+    // Releasing the context is only safe when the canvas goes with it.
+    //
+    // getContext() is idempotent per canvas: ask twice and you get the same
+    // object back, lost state included. So if React reuses this <canvas> — a
+    // Strict Mode remount, or a navigation that restores a cached page — the
+    // next GL instance gets the dead context, gl.createProgram() returns null,
+    // linking fails, and OGL's Program constructor returns early *before* it
+    // assigns uniformLocations. The crash surfaces one frame later inside
+    // renderer.render() as "uniformLocations is undefined".
+    //
+    // Deferred a frame because effect cleanup can run before React detaches
+    // the node. By the next frame the DOM has settled: canvas still in the
+    // document means something reused it, so leave its context alone.
+    const canvas = this.gl.canvas;
+    const loseContext = this.gl.getExtension("WEBGL_lose_context");
+    requestAnimationFrame(() => {
+      if (!canvas.isConnected) loseContext?.loseContext();
+    });
 
     this.textures = null;
   }

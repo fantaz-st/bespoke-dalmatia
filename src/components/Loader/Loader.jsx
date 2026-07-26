@@ -61,6 +61,9 @@ export default function Loader({ progress, showPlayButton, hidden, onPlay }) {
       <div className={styles.percent} role="status" aria-live="polite">
         {progress}%
       </div>
+      <div className={styles.welcome}>  
+      <h1>Welcome to the Sea</h1>
+      </div>
 
       <button
         type="button"

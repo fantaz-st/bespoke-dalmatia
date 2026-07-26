@@ -1,0 +1,25 @@
+.line {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  /* left is set inline, per line. */
+  height: 100%;
+  width: 1px;
+
+  z-index: -1;
+}
+
+.black {
+  background-color: var(--color-black);
+}
+
+.white {
+  background-color: var(--color-white);
+}
+
+@media (min-width: 950px) {
+  .line {
+    display: block;
+  }
+}

@@ -1,0 +1,170 @@
+.button {
+  /* Palette — variants swap these two, everything else derives from them. */
+  --btn-fg: #ffffff;
+  --btn-bg: #0d1c28;
+  --btn-border-color: transparent;
+
+  --btn-py: 0.75rem;
+  --btn-px: 1.5rem;
+  --btn-border-width: 1px;
+  --btn-radius: 5px;
+  --btn-min-height: calc(1rem + var(--btn-py) * 2 + var(--btn-border-width) * 2);
+
+  /* Wave.
+     --btn-wave-overflow is how far past the top edge the fill travels, as a
+     percentage of button height. It appears twice below — once in the fill's
+     height, once in its hover transform — and the two MUST agree, or the crest
+     stops partway up and the button never fills flat. */
+  --btn-wave-color: var(--btn-fg);
+  --btn-wave-opacity: 0.2;
+  --btn-wave-width: 15em;
+  --btn-wave-overflow: 30;
+
+  /* One full period, tileable: the slope leaving x=0 matches the slope
+     arriving at x=200, so the scrolling mask has no visible seam. The crest
+     spans y 8-32 of a 120 viewBox, i.e. the top ~20%. */
+  --btn-wave-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 120' preserveAspectRatio='none'%3E%3Cpath fill='%23fff' d='M0,20 C33.3,4 66.7,4 100,20 C133.3,36 166.7,36 200,20 L200,120 L0,120 Z'/%3E%3C/svg%3E");
+
+  position: relative;
+  z-index: 0; /* stacking context, so the fill can sit above the label */
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden; /* clips the fill to the button */
+  min-width: var(--btn-min-height);
+  min-height: var(--btn-min-height);
+  padding: calc(var(--btn-py) + var(--btn-border-width) * 2)
+    calc(var(--btn-px) + var(--btn-border-width) * 2);
+  color: var(--btn-fg);
+  font: inherit;
+  font-size: 0.875rem;
+  line-height: 1;
+  text-align: center;
+  text-decoration: none;
+  background-color: var(--btn-bg);
+  border: none;
+  border-radius: var(--btn-radius);
+  vertical-align: middle;
+  cursor: pointer;
+  appearance: none;
+}
+
+/* The border lives on a pseudo-element rather than the button itself, so
+   outline and solid variants have identical box dimensions. */
+.button::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  border: var(--btn-border-width) solid var(--btn-border-color);
+  border-radius: inherit;
+}
+
+/* The rising fill. Taller than the button by --btn-wave-overflow so that once
+   it settles, the wavy edge has cleared the top and the fill reads as flat.
+   The ±2px bleed hides subpixel gaps at the rounded corners. */
+.button::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: -2px;
+  right: -2px;
+  left: -2px;
+  height: calc(100% + 4px + var(--btn-wave-overflow) * 1%);
+  background-color: var(--btn-wave-color);
+  opacity: var(--btn-wave-opacity);
+  pointer-events: none;
+  transform: translateY(100%); /* parked below the button */
+  transition: transform 0.7s cubic-bezier(0.645, 0.045, 0.355, 1);
+  will-change: transform;
+
+  /* Scrolling the mask sideways is what makes the crest ripple as it rises.
+     Paused until hover — mask-position can't be composited, so leaving it
+     running would repaint every button on the page forever. */
+  animation: waveScroll 0.6s linear infinite;
+  animation-play-state: paused;
+
+  -webkit-mask-image: var(--btn-wave-svg);
+  mask-image: var(--btn-wave-svg);
+  -webkit-mask-size: var(--btn-wave-width) 100%;
+  mask-size: var(--btn-wave-width) 100%;
+  -webkit-mask-position: 0 0;
+  mask-position: 0 0;
+}
+
+@keyframes waveScroll {
+  from {
+    -webkit-mask-position: 0 0;
+    mask-position: 0 0;
+  }
+  to {
+    -webkit-mask-position: var(--btn-wave-width) 0;
+    mask-position: var(--btn-wave-width) 0;
+  }
+}
+
+/* Slower and softer on the way in than on the way out — the asymmetry is what
+   makes it read as liquid rather than as a panel sliding. */
+@media (hover: hover) and (pointer: fine) {
+  .button:hover::after,
+  .button:focus-visible::after {
+    transition-duration: 1s;
+    transition-timing-function: cubic-bezier(0.215, 0.61, 0.355, 1);
+    transform: translateY(
+      calc(
+        var(--btn-wave-overflow) / (100 + var(--btn-wave-overflow)) * -100%
+      )
+    );
+    animation-play-state: running;
+  }
+}
+
+/* --- Variants ------------------------------------------------------------ */
+
+.secondary {
+  --btn-fg: #0d1c28;
+  --btn-bg: #ffffff;
+  /* Not --btn-fg here: the wave would be white on white. */
+  --btn-wave-color: #7888b9;
+}
+
+.outline {
+  --btn-bg: transparent;
+  --btn-fg: #0d1c28;
+  --btn-border-color: currentColor;
+  --btn-wave-color: currentColor;
+  --btn-wave-opacity: 0.15;
+}
+
+/* --- Size ---------------------------------------------------------------- */
+
+.big {
+  --btn-py: 2rem;
+  --btn-px: 2rem;
+  /* A wide button needs a long wavelength or the crest reads as chop rather
+     than a swell. */
+  --btn-wave-width: 35vw;
+}
+
+@media (max-width: 767px) {
+  .big {
+    --btn-wave-width: 100vw;
+  }
+}
+
+/* --- Reduced motion ------------------------------------------------------ */
+
+/* The fill still happens — it's real hover feedback — but the ripple and the
+   long slow rise both go. */
+@media (prefers-reduced-motion: reduce) {
+  .button::after {
+    animation: none;
+    transition-duration: 0.15s;
+  }
+
+  .button:hover::after,
+  .button:focus-visible::after {
+    transition-duration: 0.15s;
+  }
+}

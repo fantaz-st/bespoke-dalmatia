@@ -1,0 +1,186 @@
+.section {
+  --gutter-y: 3rem;
+  --reveal-ease: cubic-bezier(0.165, 0.84, 0.44, 1);
+  /* Entrance delay = base + per-card + per-element-within-card. */
+  --delay-base: 0.1s;
+  --delay-index: 0.1s;
+  --delay-stagger: 0.1s;
+}
+
+/* --- Header -------------------------------------------------------------- */
+
+.header {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: 0.5em;
+  margin-bottom: 1.5rem;
+}
+
+.heading {
+  margin: 0;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  font-weight: 500;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  color: currentColor;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+@media (min-width: 768px) {
+  .cta {
+    margin-left: auto;
+  }
+}
+
+/* --- Card ---------------------------------------------------------------- */
+
+.item {
+  --stagger: 0;
+}
+
+/* Explicit rows only above the breakpoint; below it the cards stack in source
+   order and auto-placement is exactly right. Reading it from a variable set
+   inline is the one way to get a per-card row that a media query can still
+   switch off. */
+@media (min-width: 768px) {
+  .item {
+    grid-row-start: var(--item-row, auto);
+  }
+
+  /* Pulls the third card up out of its own row and alongside the second.
+     The percentage resolves against the card's own width (its grid area), not
+     its height — which is what makes the offset scale with the column. */
+  .lift {
+    margin-top: calc(var(--gutter-y) * -1 - 90%);
+  }
+}
+
+.link {
+  display: block;
+  color: currentColor;
+  text-decoration: none;
+}
+
+/* --- Media --------------------------------------------------------------- */
+
+.media {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: var(--ratio-base, 4 / 3);
+  margin-bottom: 1rem;
+  border-radius: 5px;
+  background-color: rgba(0, 0, 0, 0.06);
+  transform-origin: bottom;
+}
+
+@media (min-width: 768px) {
+  .media {
+    aspect-ratio: var(--ratio-sm, var(--ratio-base, 4 / 3));
+  }
+}
+
+/* The 1px bleed hides the hairline that otherwise shows at the rounded
+   corners once this is scaled. */
+.mediaInner {
+  position: absolute;
+  inset: -1px;
+}
+
+.image {
+  object-fit: cover;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mediaInner {
+    transition: transform 2s cubic-bezier(0.23, 1, 0.32, 1);
+  }
+
+  .link:hover .mediaInner,
+  .link:focus-visible .mediaInner {
+    transform: scale(1.05);
+  }
+}
+
+/* --- Text ---------------------------------------------------------------- */
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 0.5rem 0 0;
+  font-size: clamp(1.125rem, 2vw, 1.5rem);
+  font-weight: 500;
+}
+
+/* --- Entrance ------------------------------------------------------------ */
+
+/* Resting state is the animated-out state, so a card that never enters the
+   viewport simply stays hidden — no flash of finished layout on load. */
+.media,
+.image,
+.meta,
+.title {
+  transition:
+    opacity 0.2s,
+    transform 1.2s var(--reveal-ease);
+  transition-delay: calc(
+    var(--delay-base) + var(--delay-index) * var(--index, 0) +
+      var(--delay-stagger) * var(--stagger, 0)
+  );
+}
+
+.media {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+/* Counter-scale: as the frame grows 0.8 -> 1 the picture shrinks 1.2 -> 1, so
+   the image looks like it settles into place rather than being stretched. */
+.image {
+  transform: scale(1.2);
+}
+
+.meta,
+.title {
+  opacity: 0;
+  transform: translateX(0.75rem);
+}
+
+.meta {
+  --stagger: 3;
+}
+
+.title {
+  --stagger: 4;
+}
+
+.link[data-inview] .media,
+.link[data-inview] .image,
+.link[data-inview] .meta,
+.link[data-inview] .title {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .media,
+  .image,
+  .meta,
+  .title {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
