@@ -24,8 +24,16 @@ function MenuEntry({ label, src, open, focusable, delay, onClick }) {
       duration: 1,
     });
 
-    tl.to(
+    // fromTo, not to. The starting offset must be set by GSAP itself:
+    // declaring `transform: translateY(100%)` in CSS and then tweening
+    // yPercent silently no-ops, because getComputedStyle hands GSAP a pixel
+    // matrix. It reads the label as y: 21px / yPercent: 0 and animates 0 -> 0
+    // while the pixel offset stays put, leaving the label below the mask.
+    // fromTo defaults to immediateRender: true, so the label is parked
+    // off-screen on creation even though the timeline is paused.
+    tl.fromTo(
       labelRef.current,
+      { yPercent: 100 },
       { yPercent: 0, ease: "power2.out", duration: 1 },
       "-=.75"
     );

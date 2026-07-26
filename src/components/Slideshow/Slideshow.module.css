@@ -134,3 +134,34 @@
   height: 10px;
   fill: currentColor;
 }
+
+/* --- Tour description ---------------------------------------------------- */
+
+.descriptions {
+  /* Every description sits in the same grid cell, so the block is as tall as
+     the longest one and the footer never reflows between slides. Absolute
+     positioning would collapse the column to zero height instead. */
+  display: grid;
+  max-width: 80%;
+  opacity: 0;
+  transform: translateY(var(--translate-y));
+}
+
+.description {
+  grid-area: 1 / 1;
+  margin: 0;
+  line-height: 1.5;
+  opacity: 0;
+  /* visibility, not display: none — a removed element stops contributing to the
+     grid's height and the block would shrink to whichever slide is showing. */
+  visibility: hidden;
+}
+
+.descriptionActive {
+  opacity: 1;
+  visibility: visible;
+}
+
+.descriptionWord {
+  display: inline-block;
+}

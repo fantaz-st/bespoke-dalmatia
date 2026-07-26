@@ -20,7 +20,16 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" translate="no" className={roboto.variable}>
+    // The extension-injected classes on <html> land before React hydrates,
+    // so they read as a server/client mismatch. suppressHydrationWarning
+    // covers this element's own attributes only — it does not cascade, so
+    // real mismatches deeper in the tree are still reported.
+    <html
+      lang="en"
+      translate="no"
+      className={roboto.variable}
+      suppressHydrationWarning
+    >
       <body className={roboto.className}>{children}</body>
     </html>
   );

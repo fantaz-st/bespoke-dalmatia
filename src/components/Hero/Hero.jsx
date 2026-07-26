@@ -12,6 +12,7 @@ import Loader from "@/components/Loader/Loader";
 import Slideshow from "@/components/Slideshow/Slideshow";
 import SlideshowCounter from "@/components/Slideshow/SlideshowCounter";
 import SlideshowControls from "@/components/Slideshow/SlideshowControls";
+import SlideDescription from "@/components/Slideshow/SlideDescription";
 import styles from "./Hero.module.css";
 
 // Menu entries reverse over ~0.8s; waiting lets the panel clear before the
@@ -229,14 +230,7 @@ export default function Hero() {
         </div>
 
         <div className={styles.column}>
-          <div className={styles.infos} data-intro="fade">
-            <p>
-             some text here
-            </p>
-            <p>
-             more text here
-            </p>
-          </div>
+          <SlideDescription slides={slides} index={index} started={started} />
         </div>
       </footer>
     </div>

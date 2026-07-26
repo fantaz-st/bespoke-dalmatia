@@ -144,7 +144,8 @@
 
 .entryLabel {
   display: block;
-  transform: translateY(100%);
+  /* No transform here — GSAP owns it end to end. The entry's clip-path
+     keeps the label hidden until the timeline is built. */
   position: relative;
   padding: calc(var(--ring-offset) + var(--ring-width));
 }
