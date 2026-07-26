@@ -120,9 +120,13 @@ class GL {
   }
 
   attachVideosToEmptyTextures(videos) {
-    videos.forEach((video, i) => {
-      if (this.textures[i]) this.textures[i].image = video;
-    });
+    videos.forEach((video, i) => this.attachVideo(i, video));
+  }
+
+  // Slides arrive one at a time now, so textures fill as each clip lands
+  // rather than all at once after a full preload.
+  attachVideo(index, video) {
+    if (this.textures?.[index]) this.textures[index].image = video;
   }
 
   isTransitionRunning() {
@@ -174,8 +178,18 @@ class GL {
   dispose() {
     cancelAnimationFrame(this.raf);
     gsap.killTweensOf(this);
+
+    // Not a perf change, a leak fix: dropping the JS references frees nothing
+    // on the GPU. OGL's Texture has no destructor and never releases the
+    // context, so each Fast Refresh in dev stranded both until the browser got
+    // round to collecting them.
+    this.textures?.forEach((texture) => this.gl.deleteTexture(texture.texture));
+    this.gl.deleteTexture(this.transparentPixelTexture.texture);
+
     this.program.remove();
     this.geometry.remove();
+    this.gl.getExtension("WEBGL_lose_context")?.loseContext();
+
     this.textures = null;
   }
 }

@@ -67,3 +67,13 @@ export async function canAutoplay(video) {
     return false;
   }
 }
+
+/**
+ * Plain blob fetch for the slides that stream in behind the running hero.
+ * No progress reporting — nothing is waiting on these, so nothing displays it.
+ */
+export async function fetchBlobUrl(url, signal) {
+  const response = await fetch(url, { signal });
+  if (!response.ok) throw new Error(`${url} responded ${response.status}`);
+  return URL.createObjectURL(await response.blob());
+}

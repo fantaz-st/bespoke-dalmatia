@@ -34,6 +34,7 @@ export default function Slideshow({ ref, slides, index, started }) {
 
   useImperativeHandle(ref, () => ({
     attachVideos: (videos) => glRef.current?.attachVideosToEmptyTextures(videos),
+    attachVideo: (i, video) => glRef.current?.attachVideo(i, video),
     isTransitioning: () => glRef.current?.isTransitionRunning() ?? false,
   }));
 
