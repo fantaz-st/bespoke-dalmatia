@@ -1,0 +1,74 @@
+.header {
+  position: fixed;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.column {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--column-padding-y) var(--column-padding-x);
+  width: var(--column-width);
+}
+
+/* First column spans the whole header on mobile. */
+.column:first-of-type {
+  width: 100%;
+  align-items: center;
+}
+
+/* The rest is simply hidden on small screens. */
+.column:not(:first-of-type) {
+  display: none;
+}
+
+@media (min-width: 950px) {
+  .column:first-of-type {
+    width: var(--column-width);
+  }
+
+  .column:not(:first-of-type) {
+    display: flex;
+  }
+}
+
+.logo {
+  background-color: transparent;
+  border-width: 0;
+  padding: 0;
+  margin: 0;
+  display: block;
+  color: var(--color-fg);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(calc(var(--translate-y) * -1));
+}
+
+.logoSvg {
+  width: 40px;
+  fill: currentColor;
+}
+
+.burger {
+  opacity: 0;
+  transform: translateY(calc(var(--translate-y) * -1));
+}
+
+.button {
+  border-width: 0;
+  background-color: var(--color-bg);
+  padding: 5px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--color-fg);
+  font-family: inherit;
+  font-size: 1em;
+  text-decoration: none;
+  margin-left: auto;
+  opacity: 0;
+  transform: translateY(calc(var(--translate-y) * -1));
+}

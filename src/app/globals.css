@@ -1,0 +1,63 @@
+:root {
+  /* SIZING */
+  --column-width: 33.3333vw;
+  --column-padding-x: 30px;
+  --column-padding-y: 20px;
+  --header-height: 83px;
+
+  /* COLOR */
+  --color-bg: #ffcbcb; /* pastel pink */
+  --color-fg: #ffffff;
+
+  /* ANIMATION */
+  --easing: cubic-bezier(0.33, 1, 0.68, 1); /* ease out cubic */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --translate-y: 100px;
+
+  /* A11Y — FOCUS RING */
+  --ring-width: 2px;
+  --ring-offset: 5px;
+  --ring-color: #ffffff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-size: 14px;
+  background-color: var(--color-bg);
+  color: var(--color-fg);
+  overflow: hidden;
+}
+
+/* Only show the focus ring for keyboard navigation. */
+*:focus {
+  outline: var(--ring-width) solid var(--ring-color);
+  outline-offset: var(--ring-offset);
+}
+
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: var(--ring-width) solid var(--ring-color);
+  outline-offset: var(--ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}

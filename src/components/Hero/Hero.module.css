@@ -1,0 +1,116 @@
+.app {
+  display: flex;
+  min-height: 100vh;
+  min-height: 100dvh; /* accounts for mobile browser chrome */
+  flex-direction: column;
+}
+
+/* --- Vertical column guides ---------------------------------------------- */
+
+.line {
+  display: none;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: var(--column-width);
+  height: 100%;
+  width: 1px;
+  background-color: var(--color-fg);
+  transform-origin: 50% 100%;
+  transform: scaleY(0);
+}
+
+.lineLast {
+  left: calc(var(--column-width) * 2);
+}
+
+@media (min-width: 950px) {
+  .line {
+    display: block;
+  }
+}
+
+/* --- Footer -------------------------------------------------------------- */
+
+.footer {
+  position: relative;
+  width: 100%;
+  color: var(--color-fg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden; /* stops a transient scrollbar during the intro */
+  padding-left: var(--column-padding-x);
+  padding-right: var(--column-padding-x);
+}
+
+@media (min-width: 950px) {
+  .footer {
+    flex-direction: row;
+    padding-left: 0;
+    padding-right: 0;
+  }
+}
+
+.column {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  padding: var(--column-padding-y) 0;
+}
+
+@media (min-width: 950px) {
+  .column {
+    width: var(--column-width);
+    padding-left: var(--column-padding-x);
+    padding-right: var(--column-padding-x);
+  }
+}
+
+/* Horizontal rule that stands in for the vertical guides on mobile, where the
+   footer stacks instead of sitting in columns. */
+.ruledColumn {
+  --ruleScaleX: 0;
+}
+
+.ruledColumn::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-fg);
+  transform: scaleX(var(--ruleScaleX));
+  transform-origin: 0% 0%;
+}
+
+@media (min-width: 950px) {
+  .ruledColumn::after {
+    display: none;
+  }
+}
+
+.slideshowUi {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- Credits ------------------------------------------------------------- */
+
+.infos {
+  max-width: 80%;
+  opacity: 0;
+  transform: translateY(var(--translate-y));
+}
+
+.infos p {
+  margin: 0 0 10px 0;
+}
+
+.link {
+  color: currentColor;
+}

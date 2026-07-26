@@ -1,0 +1,136 @@
+.slideshow {
+  display: flex;
+  flex-grow: 1;
+  margin-top: var(--header-height);
+}
+
+@media (min-width: 950px) {
+  .slideshow {
+    width: 100vw;
+  }
+}
+
+/* The canvas is sized to the full viewport by the renderer, so it sits behind
+   everything rather than inside the flex flow. */
+.gl {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Captions ------------------------------------------------------------ */
+
+.captionsContainer {
+  position: relative;
+  width: 100%;
+  padding-left: var(--column-padding-x);
+}
+
+.caption {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  font-weight: 700;
+  font-size: clamp(2.75rem, 8vw, 70px);
+  display: none;
+  pointer-events: none;
+}
+
+.caption.active {
+  display: block;
+}
+
+.word {
+  display: block;
+  overflow: hidden;
+  /* Tightening with a negative margin rather than line-height: line-height
+     clips descenders once the word is an overflow-hidden mask. */
+  margin-bottom: -0.21em;
+}
+
+.char {
+  display: inline-block;
+  white-space: pre;
+}
+
+/* --- UI row -------------------------------------------------------------- */
+
+.ui {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* --- Counter ------------------------------------------------------------- */
+
+.counter {
+  display: flex;
+  font-size: 0.75rem;
+  user-select: none;
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(var(--translate-y));
+}
+
+.counterNumber {
+  padding: 3px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.currentNumberContainer {
+  position: relative;
+  height: 21px;
+  padding-right: 15px;
+}
+
+.nextNumber {
+  position: absolute;
+  top: 0;
+  transform: translateY(100%);
+}
+
+.totalNumber {
+  border-left: 1px solid currentColor;
+  padding-left: 15px;
+}
+
+/* --- Controls ------------------------------------------------------------ */
+
+.controls {
+  display: flex;
+  opacity: 0;
+  transform: translateY(var(--translate-y));
+}
+
+.controlsButton {
+  color: currentColor;
+  background-color: transparent;
+  height: 40px;
+  width: 40px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 250ms var(--easing), color 250ms var(--easing);
+}
+
+.controlsButton:hover {
+  background-color: var(--color-fg);
+  color: var(--color-bg);
+}
+
+.controlsButton:first-of-type {
+  margin-right: 10px;
+}
+
+.controlsButton:last-of-type {
+  margin-left: 10px;
+}
+
+.controlsIcon {
+  width: 10px;
+  height: 10px;
+  fill: currentColor;
+}

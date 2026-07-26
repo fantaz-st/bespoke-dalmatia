@@ -1,0 +1,189 @@
+.menu {
+  position: fixed;
+  z-index: 2; /* above the overlay */
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  pointer-events: none;
+}
+
+/* An in-between breakpoint so a full-width panel doesn't feel like a punch in
+   the face on medium screens. */
+@media (min-width: 500px) {
+  .menu {
+    width: calc(var(--column-width) * 2);
+  }
+}
+
+@media (min-width: 950px) {
+  .menu {
+    width: var(--column-width);
+  }
+}
+
+/* Discreet shadow. A pseudo-element with an animated opacity is much cheaper
+   than animating box-shadow on the element itself. */
+.menu::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  transition: opacity 0.75s var(--easing);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+}
+
+/* Flat backdrop beneath the entries. */
+.menu::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-color: var(--color-bg);
+  transition: transform 0.75s var(--easing);
+  transform-origin: 0 0;
+  transform: scaleY(0);
+}
+
+.menu.active {
+  pointer-events: all;
+}
+
+.menu.active::before {
+  opacity: 1;
+}
+
+.menu.active::after {
+  transform: scaleY(1);
+}
+
+.menu.active + .overlay {
+  opacity: 0.75;
+  pointer-events: all;
+}
+
+.menu.active .menuBurger {
+  transition-delay: 0ms;
+  opacity: 1;
+}
+
+.menuBurger {
+  opacity: 0;
+  position: fixed;
+  right: var(--column-padding-x);
+  /* Lines the close icon up on top of the header's burger. */
+  top: 32px;
+  z-index: 1;
+  transition: opacity 1s var(--easing);
+  transition-delay: 500ms;
+}
+
+@media (min-width: 950px) {
+  .menuBurger {
+    position: absolute;
+    top: 31.5px;
+  }
+}
+
+.entriesList {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.entry {
+  position: relative;
+  flex-basis: 0;
+  flex-grow: 1;
+  overflow: hidden;
+  clip-path: inset(0 100% 0 0);
+  pointer-events: auto;
+}
+
+.entryLink {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  color: var(--color-fg);
+  text-decoration: none;
+  font-family: inherit;
+  font-size: 25px;
+  font-weight: 700;
+  border-width: 0;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.entryLink:hover .entryPicture,
+.entryLink:focus .entryPicture {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.entryLink:focus {
+  outline: none;
+}
+
+.entryLink:focus-visible .entryLabel::after {
+  opacity: 1;
+}
+
+.entryLabelContainer {
+  margin: 0 0 calc(var(--column-padding-y) - (var(--ring-offset) + var(--ring-width)))
+    calc(var(--column-padding-x) - (var(--ring-offset) + var(--ring-width)));
+  overflow: hidden;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+.entryLabel {
+  display: block;
+  transform: translateY(100%);
+  position: relative;
+  padding: calc(var(--ring-offset) + var(--ring-width));
+}
+
+.entryLabel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: var(--ring-width) solid var(--ring-color);
+  opacity: 0;
+}
+
+/* Bleeds past the container so it still covers it once rotated on hover. */
+.entryPicture {
+  position: absolute;
+  z-index: -1;
+  top: -20px;
+  left: -20px;
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  object-fit: cover;
+  transition: transform 3s var(--ease-out-expo);
+}
+
+/* Not the same as .menu::after — this one covers the whole screen, dims the
+   page behind the panel, and closes the menu on click. */
+.overlay {
+  position: fixed;
+  z-index: 1;
+  inset: 0;
+  opacity: 0;
+  /* Black on small screens because the close icon sits outside the panel. */
+  background-color: #000;
+  transition: opacity 0.75s var(--easing);
+  pointer-events: none;
+}
+
+@media (min-width: 950px) {
+  .overlay {
+    background-color: var(--color-bg);
+  }
+}
