@@ -1,6 +1,8 @@
 import { Roboto } from "next/font/google";
 import "./globals.css";
 
+import SmoothScroll from "@/components/SmoothScroll/SmoothScroll";
+
 const roboto = Roboto({
   subsets: ["latin"],
   weight: ["400","500", "700", "900"],
@@ -30,7 +32,12 @@ export default function RootLayout({ children }) {
       className={roboto.variable}
       suppressHydrationWarning
     >
-      <body className={roboto.className}>{children}</body>
+      <body className={roboto.className}>
+        {/* Renders nothing — it drives the page scroll and cleans up after
+            itself, so it sits alongside the content rather than wrapping it. */}
+        <SmoothScroll />
+        {children}
+      </body>
     </html>
   );
 }

@@ -6,17 +6,9 @@ export default function AboutUs() {
   return (
     <section className={styles.aboutUs}>
       <Copy>
-        <p className={styles.title}>
-          Your day. Our sea. Private boat days shaped around you, guided by
-          people who have called these waters home for decades.
-        </p>
+        <p className={styles.title}>Your day. Our sea. Private boat days shaped around you, guided by people who have called these waters home for decades.</p>
       </Copy>
-      <Button
-        href="/about"
-        variant="outline"
-        className={styles.button}
-        data-intro="fade"
-      >
+      <Button href="/about" variant="outline" className={styles.button} data-intro="fade">
         Learn More
       </Button>
     </section>

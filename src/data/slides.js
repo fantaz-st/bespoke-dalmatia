@@ -6,24 +6,21 @@
 const slides = [
   {
     src: "/videos/half.mp4",
-    poster: "/img/mini-planets.jpg",
+    poster: "/img/tours/lagoon.jpg",
     caption: "Blue Lagoon & Three Islands Escape",
-    description:
-      "Turquoise shallows off Drvenik Veli, lunch in Maslinica, then a slow drift home through Šolta's coves. Half day, three stops.",
+    description: "Turquoise shallows off Drvenik Veli, lunch in Maslinica, then a slow drift home through Šolta's coves. Half day, three stops.",
   },
   {
     src: "/videos/cave.mp4",
-    poster: "/img/galaxy-gates.jpg",
+    poster: "/img/tours/cave.jpg",
     caption: "Blue Cave & Five Islands Expedition",
-    description:
-      "An early start for the Blue Cave at Biševo, then Komiža, Stiniva cove, Budikovac Blue Lagoon and Hvar before the run back. Full day.",
+    description: "An early start for the Blue Cave at Biševo, then Komiža, Stiniva cove, Budikovac Blue Lagoon and Hvar before the run back. Full day.",
   },
   {
     src: "/videos/lagoon.mp4",
-    poster: "/img/kingdom-of-colors.jpg",
+    poster: "/img/tours/pakleni.jpg",
     caption: "Hvar & Pakleni Islands Experience",
-    description:
-      "Anchor off Palmižana, swim the Pakleni channels, and take Hvar town at your own pace. Sunset return optional.",
+    description: "Anchor off Palmižana, swim the Pakleni channels, and take Hvar town at your own pace. Sunset return optional.",
   },
   /*  {
     src: "/videos/galaxy-gates.mp4",

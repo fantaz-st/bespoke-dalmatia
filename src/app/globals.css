@@ -1,6 +1,14 @@
 :root {
   /* SIZING */
+  /* Hero only — viewport thirds, no grid involved. */
   --column-width: 33.3333vw;
+
+  /* GRID METRICS — read by Grid, ThreeLines and any section that has
+     to line up with them. Changing a value here moves all three.
+     Keep them together or the guides drift off the columns. */
+  --grid-columns: 12;
+  --grid-gap: clamp(0.75rem, 1.5vw, 1.25rem);
+  --grid-padding: 40px;
   --column-padding-x: 30px;
   --column-padding-y: 20px;
   --header-height: 83px;
@@ -39,7 +47,11 @@ body {
   font-size: 14px;
   background-color: var(--color-bg);
   color: var(--color-fg);
-  overflow-x: hidden;
+  /* clip, not hidden. overflow-x: hidden forces overflow-y to compute to auto,
+     which turns <body> into its own scroll container — Lenis then drives the
+     window while the content scrolls in the body, and the two disagree. It also
+     breaks position: sticky for every descendant. clip does neither. */
+  overflow-x: clip;
 }
 
 /* Only show the focus ring for keyboard navigation. */
@@ -90,7 +102,7 @@ body {
   }
   to {
     transform: translateY(-25%);
-    opacity: 0;
+    opacity: 0.25;
   }
 }
 

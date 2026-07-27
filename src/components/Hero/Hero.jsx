@@ -26,10 +26,10 @@ const MENU_CLOSE_DURATION = 800;
 // Matches the shader crossfade (1.5s) with a little headroom.
 const TRANSITION_DURATION = 1600;
 
-// How long the welcome layer owns the screen, measured from the moment the
-// loader starts leaving. Its entrance costs ~1.05s of this, so the heading sits
-// fully settled for a little over a second before the hero takes over.
-const WELCOME_HOLD = 2500;
+// Measured from the moment the ring fills. The line's 0.5s entrance comes out
+// of this, leaving the ring and the text on screen together for 1.5s before
+// both leave and the hero takes over.
+const WELCOME_HOLD = 2000;
 
 export default function Hero() {
   const rootRef = useRef(null);
@@ -142,24 +142,13 @@ export default function Hero() {
     if (!el || phase === "loading") return;
 
     if (phase === "welcome") {
-      gsap.fromTo(
-        el,
-        { opacity: 0, y: 20 },
-        { opacity: 1, y: 0, duration: 0.8, delay: 0.75, ease: "power2.out" },
-      );
+      gsap.fromTo(el, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.5, delay: 0.5, ease: "power2.out" });
       return;
     }
 
-    // Leaves upward as the hero's column guides start drawing underneath. Note
-    // there is no display: none at the end — the heading stays at opacity 0 in
-    // the accessibility tree, so it remains the page's h1 for anyone
-    // navigating by heading.
-    gsap.to(el, {
-      opacity: 0,
-      y: -20,
-      duration: 0.5,
-      ease: "power2.in",
-    });
+    // Leaves alongside the loader rather than after it, so ring and text read
+    // as one object lifting off the screen.
+    gsap.to(el, { opacity: 0, y: -40, duration: 0.6, ease: "power2.in" });
   }, [phase]);
 
   // --- Playback ------------------------------------------------------------
@@ -240,15 +229,9 @@ export default function Hero() {
 
   // Wrap against what's loaded rather than slides.length, so the arrows stay
   // usable while the tail of the set is still downloading.
-  const goToNext = useCallback(
-    () => goToSlide(index >= loadedCount - 1 ? 0 : index + 1),
-    [goToSlide, index, loadedCount],
-  );
+  const goToNext = useCallback(() => goToSlide(index >= loadedCount - 1 ? 0 : index + 1), [goToSlide, index, loadedCount]);
 
-  const goToPrevious = useCallback(
-    () => goToSlide(index === 0 ? loadedCount - 1 : index - 1),
-    [goToSlide, index, loadedCount],
-  );
+  const goToPrevious = useCallback(() => goToSlide(index === 0 ? loadedCount - 1 : index - 1), [goToSlide, index, loadedCount]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -267,10 +250,7 @@ export default function Hero() {
     (i) => {
       setMenuOpen(false);
       clearTimeout(menuTimeoutRef.current);
-      menuTimeoutRef.current = setTimeout(
-        () => goToSlide(i),
-        MENU_CLOSE_DURATION,
-      );
+      menuTimeoutRef.current = setTimeout(() => goToSlide(i), MENU_CLOSE_DURATION);
     },
     [goToSlide],
   );
@@ -283,41 +263,24 @@ export default function Hero() {
 
       <Header menuOpen={menuOpen} onToggleMenu={toggleMenu} />
 
-      <Loader progress={progress} hidden={phase !== "loading"} />
+      {/* Stays up through the welcome phase and leaves with the text. */}
+      <Loader progress={progress} hidden={phase === "playing"} />
 
       <div className={styles.welcome} ref={welcomeRef}>
-        <p className={styles.welcomeTitle}>Welcome to the Sea</p>
+        <p className={styles.welcomeText}>Welcome to the Sea</p>
       </div>
 
-      <Slideshow
-        ref={slideshowRef}
-        slides={slides}
-        index={index}
-        started={started}
-      />
+      <Slideshow ref={slideshowRef} slides={slides} index={index} started={started} />
 
       <div className={styles.line} data-intro="line" />
       <div className={`${styles.line} ${styles.lineLast}`} data-intro="line" />
 
-      {started && (
-        <Menu
-          slides={slides}
-          open={menuOpen}
-          onToggle={toggleMenu}
-          onSelect={selectFromMenu}
-        />
-      )}
+      {started && <Menu slides={slides} open={menuOpen} onToggle={toggleMenu} onSelect={selectFromMenu} />}
 
       <footer className={styles.footer}>
-        <div
-          className={`${styles.column} ${styles.ruledColumn}`}
-          data-intro="rule"
-        >
+        <div className={`${styles.column} ${styles.ruledColumn}`} data-intro="rule">
           <div className={styles.slideshowUi}>
-            <SlideshowCounter
-              value={started ? index + 1 : 0}
-              total={slides.length}
-            />
+            <SlideshowCounter value={started ? index + 1 : 0} total={slides.length} />
             <SlideshowControls onPrevious={goToPrevious} onNext={goToNext} />
           </div>
         </div>

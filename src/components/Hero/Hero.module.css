@@ -119,31 +119,30 @@
 /* --- Welcome -------------------------------------------------------------- */
 
 .welcome {
+  /* Half the loader's 125px, plus a gap. Keep in step with .loader's size in
+     Loader.module.css — both are positioned from the same centre point. */
+  --loader-radius: 62.5px;
+  --gap-below-ring: 24px;
+
   position: fixed;
-  /* Under the loader (3) so the loader stays on top through its exit, over the
-     header (1) so nothing shows through the heading. */
-  z-index: 2;
-  inset: 0;
-  display: grid;
-  place-items: center;
+  /* Same layer as the loader so the pair rises together as one object. */
+  z-index: 3;
+  top: calc(50% + var(--loader-radius) + var(--gap-below-ring));
+  /* Full width plus text-align rather than a centring transform: GSAP animates
+     y on this element, and a translateX(-50%) would be overwritten. */
+  left: 0;
+  right: 0;
   padding-inline: var(--column-padding-x);
   text-align: center;
 
-  /* Starts hidden and ends hidden — GSAP owns the value in between. No
-     display: none at either end, so the h1 stays in the accessibility tree. */
+  /* Starts and ends hidden — GSAP owns the value in between. */
   opacity: 0;
   pointer-events: none;
 }
 
-.welcomeTitle {
+.welcomeText {
   margin: 0;
-  /* font-size: clamp(2.5rem, 9vw, 7rem); */
-  font-weight: 500;
-  line-height: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .welcome {
-    transition: none;
-  }
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }

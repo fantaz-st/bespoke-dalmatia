@@ -9,6 +9,8 @@
   /* Unset, a Col fills the row. */
   --_width: var(--w-xs, var(--columns, 12));
   --_start: var(--o-xs, auto);
+  position: relative;
+  overflow: hidden;
 }
 
 /* Ascending order matters. Each block resolves with the widest breakpoint the
@@ -29,10 +31,7 @@
 }
 @media (min-width: 1400px) {
   .col {
-    --_width: var(
-      --w-lg,
-      var(--w-md, var(--w-sm, var(--w-xs, var(--columns, 12))))
-    );
+    --_width: var(--w-lg, var(--w-md, var(--w-sm, var(--w-xs, var(--columns, 12)))));
     --_start: var(--o-lg, var(--o-md, var(--o-sm, var(--o-xs, auto))));
   }
 }
