@@ -1,3 +1,4 @@
+import Link from "next/link";
 import styles from "./Button.module.css";
 
 const VARIANTS = {
@@ -6,14 +7,6 @@ const VARIANTS = {
   outline: styles.outline,
 };
 
-/**
- * Renders an <a> when given href, a <button> otherwise — the wave effect is
- * purely CSS, so both elements behave identically.
- *
- * No "use client" directive on purpose: without hooks of its own this stays
- * usable from a Server Component, and it still lands in the client bundle
- * automatically when a Client Component imports it.
- */
 export default function Button({
   href,
   variant = "primary",
@@ -33,9 +26,9 @@ export default function Button({
 
   if (href) {
     return (
-      <a href={href} className={classes} {...rest}>
+      <Link href={href} className={classes} {...rest}>
         {children}
-      </a>
+      </Link>
     );
   }
 

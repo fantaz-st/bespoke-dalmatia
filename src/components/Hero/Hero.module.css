@@ -115,3 +115,35 @@
 .link {
   color: currentColor;
 }
+
+/* --- Welcome -------------------------------------------------------------- */
+
+.welcome {
+  position: fixed;
+  /* Under the loader (3) so the loader stays on top through its exit, over the
+     header (1) so nothing shows through the heading. */
+  z-index: 2;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding-inline: var(--column-padding-x);
+  text-align: center;
+
+  /* Starts hidden and ends hidden — GSAP owns the value in between. No
+     display: none at either end, so the h1 stays in the accessibility tree. */
+  opacity: 0;
+  pointer-events: none;
+}
+
+.welcomeTitle {
+  margin: 0;
+  /* font-size: clamp(2.5rem, 9vw, 7rem); */
+  font-weight: 500;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome {
+    transition: none;
+  }
+}

@@ -1,17 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import gsap from "gsap";
 
 import styles from "./Loader.module.css";
 
-export default function Loader({ progress, showPlayButton, hidden, onPlay }) {
+export default function Loader({ progress, hidden }) {
   const rootRef = useRef(null);
-  const buttonRef = useRef(null);
-  const [buttonActive, setButtonActive] = useState(false);
 
   useEffect(() => {
     if (!hidden) return;
+
     gsap.to(rootRef.current, {
       yPercent: -100,
       opacity: 0,
@@ -20,23 +19,6 @@ export default function Loader({ progress, showPlayButton, hidden, onPlay }) {
       onComplete: () => gsap.set(rootRef.current, { display: "none" }),
     });
   }, [hidden]);
-
-  useEffect(() => {
-    if (!showPlayButton) return;
-
-    const tl = gsap.timeline();
-
-    tl.to(rootRef.current, {
-      "--beforeScaleY": 1,
-      duration: 0.5,
-      ease: "power2.out",
-      onComplete: () => setButtonActive(true),
-    });
-
-    tl.to(buttonRef.current, { opacity: 1, duration: 1, ease: "power2.out" }, "-=.5");
-
-    return () => tl.kill();
-  }, [showPlayButton]);
 
   return (
     <div className={styles.loader} ref={rootRef}>
@@ -61,21 +43,6 @@ export default function Loader({ progress, showPlayButton, hidden, onPlay }) {
       <div className={styles.percent} role="status" aria-live="polite">
         {progress}%
       </div>
-      <div className={styles.welcome}>  
-      <h1>Welcome to the Sea</h1>
-      </div>
-
-      <button
-        type="button"
-        className={`${styles.playButton} ${buttonActive ? styles.active : ""}`}
-        ref={buttonRef}
-        onClick={onPlay}
-        aria-label="Play"
-      >
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" aria-hidden="true">
-          <path d="M296 146L40 2a16 16 0 00-24 14v288a16 16 0 0024 14l256-144a16 16 0 000-28z" />
-        </svg>
-      </button>
     </div>
   );
 }

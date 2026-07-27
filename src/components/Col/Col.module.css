@@ -1,0 +1,38 @@
+.col {
+  grid-column-start: var(--_start);
+  grid-column-end: span var(--_width);
+
+  /* Belt and braces with the track's minmax(0, 1fr): a column spanning several
+     tracks still needs its own floor, or wide content pushes it out. */
+  min-width: 0;
+
+  /* Unset, a Col fills the row. */
+  --_width: var(--w-xs, var(--columns, 12));
+  --_start: var(--o-xs, auto);
+}
+
+/* Ascending order matters. Each block resolves with the widest breakpoint the
+   viewport has passed on the outside, falling back inward to whatever was last
+   declared — so xs={{12}} md={{6}} keeps its 6 at lg. */
+
+@media (min-width: 600px) {
+  .col {
+    --_width: var(--w-sm, var(--w-xs, var(--columns, 12)));
+    --_start: var(--o-sm, var(--o-xs, auto));
+  }
+}
+@media (min-width: 950px) {
+  .col {
+    --_width: var(--w-md, var(--w-sm, var(--w-xs, var(--columns, 12))));
+    --_start: var(--o-md, var(--o-sm, var(--o-xs, auto)));
+  }
+}
+@media (min-width: 1400px) {
+  .col {
+    --_width: var(
+      --w-lg,
+      var(--w-md, var(--w-sm, var(--w-xs, var(--columns, 12))))
+    );
+    --_start: var(--o-lg, var(--o-md, var(--o-sm, var(--o-xs, auto))));
+  }
+}

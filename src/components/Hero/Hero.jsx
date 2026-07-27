@@ -5,11 +5,7 @@ import dynamic from "next/dynamic";
 import gsap from "gsap";
 
 import slides from "@/data/slides";
-import {
-  preloadWithProgress,
-  fetchBlobUrl,
-  canAutoplay,
-} from "@/lib/preload";
+import { preloadWithProgress, fetchBlobUrl } from "@/lib/preload";
 import SVGSpritesheet from "@/components/Icons/SVGSpritesheet";
 import Header from "@/components/Header/Header";
 import Loader from "@/components/Loader/Loader";
@@ -30,16 +26,24 @@ const MENU_CLOSE_DURATION = 800;
 // Matches the shader crossfade (1.5s) with a little headroom.
 const TRANSITION_DURATION = 1600;
 
+// How long the welcome layer owns the screen, measured from the moment the
+// loader starts leaving. Its entrance costs ~1.05s of this, so the heading sits
+// fully settled for a little over a second before the hero takes over.
+const WELCOME_HOLD = 2500;
+
 export default function Hero() {
   const rootRef = useRef(null);
   const slideshowRef = useRef(null);
   const videosRef = useRef([]);
   const menuTimeoutRef = useRef(null);
+  const welcomeRef = useRef(null);
 
   const [progress, setProgress] = useState(0);
-  const [ready, setReady] = useState(false); // videos decoded, waiting to start
-  const [started, setStarted] = useState(false); // playing
-  const [needsGesture, setNeedsGesture] = useState(false);
+  const [ready, setReady] = useState(false); // first clip decoded
+  // One value instead of three booleans, because the three states are strictly
+  // sequential: loading -> welcome -> playing.
+  const [phase, setPhase] = useState("loading");
+  const started = phase === "playing";
   const [index, setIndex] = useState(0);
   const [loadedCount, setLoadedCount] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -116,30 +120,47 @@ export default function Hero() {
     };
   }, []);
 
-  // --- Start ---------------------------------------------------------------
-  const start = useCallback(() => {
-    videosRef.current[0]?.play();
-    setNeedsGesture(false);
-    setStarted(true);
-  }, []);
-
-  // Autoplay policies vary by browser and battery state, so probe rather than
-  // assume: if the promise rejects, fall back to the play button.
+  // --- Phases ---------------------------------------------------------------
   useEffect(() => {
-    if (!ready || started) return;
+    if (!ready || phase !== "loading") return;
 
-    let cancelled = false;
+    // Started here rather than at "playing" so the clip is already warm and
+    // decoding by the time the hero animates in.
+    videosRef.current[0]?.play().catch(() => {});
+    setPhase("welcome");
+  }, [ready, phase]);
 
-    canAutoplay(videosRef.current[0]).then((allowed) => {
-      if (cancelled) return;
-      if (allowed) start();
-      else setNeedsGesture(true);
+  useEffect(() => {
+    if (phase !== "welcome") return;
+    const timeout = setTimeout(() => setPhase("playing"), WELCOME_HOLD);
+    return () => clearTimeout(timeout);
+  }, [phase]);
+
+  // --- Welcome --------------------------------------------------------------
+  useEffect(() => {
+    const el = welcomeRef.current;
+    if (!el || phase === "loading") return;
+
+    if (phase === "welcome") {
+      gsap.fromTo(
+        el,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, delay: 0.75, ease: "power2.out" },
+      );
+      return;
+    }
+
+    // Leaves upward as the hero's column guides start drawing underneath. Note
+    // there is no display: none at the end — the heading stays at opacity 0 in
+    // the accessibility tree, so it remains the page's h1 for anyone
+    // navigating by heading.
+    gsap.to(el, {
+      opacity: 0,
+      y: -20,
+      duration: 0.5,
+      ease: "power2.in",
     });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [ready, started, start]);
+  }, [phase]);
 
   // --- Playback ------------------------------------------------------------
   // Only the visible clip decodes. Four videos playing at once was the bulk of
@@ -147,7 +168,17 @@ export default function Hero() {
   useEffect(() => {
     if (!started) return;
 
-    videosRef.current[index]?.play().catch(() => {});
+    const current = videosRef.current[index];
+    let removeResume;
+
+    current?.play().catch(() => {
+      // Autoplay refused — iOS low power mode is the usual culprit. With no
+      // play button any more, retry silently on the first interaction of any
+      // kind rather than leaving a frozen frame.
+      const resume = () => current.play().catch(() => {});
+      window.addEventListener("pointerdown", resume, { once: true });
+      removeResume = () => window.removeEventListener("pointerdown", resume);
+    });
 
     // The outgoing clip keeps running until the slice transition finishes,
     // otherwise it freezes while still half visible.
@@ -157,7 +188,10 @@ export default function Hero() {
       });
     }, TRANSITION_DURATION);
 
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      removeResume?.();
+    };
   }, [index, started]);
 
   // --- Intro timeline ------------------------------------------------------
@@ -201,19 +235,19 @@ export default function Hero() {
       if (next >= loadedCount) return;
       setIndex(next);
     },
-    [loadedCount]
+    [loadedCount],
   );
 
   // Wrap against what's loaded rather than slides.length, so the arrows stay
   // usable while the tail of the set is still downloading.
   const goToNext = useCallback(
     () => goToSlide(index >= loadedCount - 1 ? 0 : index + 1),
-    [goToSlide, index, loadedCount]
+    [goToSlide, index, loadedCount],
   );
 
   const goToPrevious = useCallback(
     () => goToSlide(index === 0 ? loadedCount - 1 : index - 1),
-    [goToSlide, index, loadedCount]
+    [goToSlide, index, loadedCount],
   );
 
   useEffect(() => {
@@ -235,10 +269,10 @@ export default function Hero() {
       clearTimeout(menuTimeoutRef.current);
       menuTimeoutRef.current = setTimeout(
         () => goToSlide(i),
-        MENU_CLOSE_DURATION
+        MENU_CLOSE_DURATION,
       );
     },
-    [goToSlide]
+    [goToSlide],
   );
 
   useEffect(() => () => clearTimeout(menuTimeoutRef.current), []);
@@ -249,12 +283,11 @@ export default function Hero() {
 
       <Header menuOpen={menuOpen} onToggleMenu={toggleMenu} />
 
-      <Loader
-        progress={progress}
-        showPlayButton={needsGesture}
-        hidden={started}
-        onPlay={start}
-      />
+      <Loader progress={progress} hidden={phase !== "loading"} />
+
+      <div className={styles.welcome} ref={welcomeRef}>
+        <p className={styles.welcomeTitle}>Welcome to the Sea</p>
+      </div>
 
       <Slideshow
         ref={slideshowRef}
@@ -276,7 +309,10 @@ export default function Hero() {
       )}
 
       <footer className={styles.footer}>
-        <div className={`${styles.column} ${styles.ruledColumn}`} data-intro="rule">
+        <div
+          className={`${styles.column} ${styles.ruledColumn}`}
+          data-intro="rule"
+        >
           <div className={styles.slideshowUi}>
             <SlideshowCounter
               value={started ? index + 1 : 0}

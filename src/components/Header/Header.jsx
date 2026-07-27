@@ -3,7 +3,6 @@
 import BurgerButton from "@/components/Menu/BurgerButton";
 import styles from "./Header.module.css";
 import Button from "../Button/Button";
-import Link from "next/link";
 
 export default function Header({ menuOpen, onToggleMenu }) {
   return (
@@ -41,9 +40,9 @@ export default function Header({ menuOpen, onToggleMenu }) {
         >
           Contact
         </Button>
-        <Link href="/contact" className={styles.link} data-intro="fade">
+        {/* <Link href="/contact" className={styles.link} data-intro="fade">
           Contact
-        </Link>
+        </Link> */}
       </div>
     </header>
   );
