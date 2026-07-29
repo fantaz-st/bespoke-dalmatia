@@ -1,0 +1,28 @@
+.root {
+  position: relative;
+  aspect-ratio: var(--ratio, 3 / 2);
+  overflow: hidden;
+}
+
+/* Rests fully open. With JavaScript off, or under reduced motion, the image is
+   simply there — GSAP closes the mask when it builds the trigger. */
+.clip {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0% 0% 0% 0%);
+  /* clip-path cannot be composited, so promote the layer up front rather than
+     paying for it on the first frame of the animation. */
+  will-change: clip-path;
+}
+
+.scaler {
+  position: absolute;
+  /* Bleeds a pixel past the edges: a scaled child can otherwise leave a
+     hairline of background showing along the mask boundary. */
+  inset: -1px;
+  will-change: transform;
+}
+
+.image {
+  object-fit: cover;
+}
